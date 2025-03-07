@@ -10,6 +10,7 @@ const Login = ({ videoSrc }) => {
   const [credentials, setCredentials] = useState({ username: '', password: '', email: '' });
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
+  const [isLoading, setIsLoading] = useState(false); // Add this line
   const navigate = useNavigate();
 
   // Handle input changes
@@ -23,25 +24,29 @@ const Login = ({ videoSrc }) => {
     e.preventDefault();
     setErrorMessage('');
     setSuccessMessage('');
-
+    setIsLoading(true); // Show spinner
+  
+   
+  
     try {
       const endpoint = activeTab === 'user' ? 'api/users/login' : 'api/admins/login';
-      console.log('Sending request to:', `https://codeveritus-1.onrender.com/${endpoint}`);
       
-      // Changed to use email field for both user and admin
+    
+  
       const response = await axios.post(`https://codeveritus-1.onrender.com/${endpoint}`, {
         email: credentials.email,
         password: credentials.password,
       });
-
+  
       if (response.status === 200) {
-        // Store username/adminname from response and JWT token
         localStorage.setItem('username', response.data.username || response.data.adminname);
         localStorage.setItem('jwtToken', response.data.jwtToken);
         activeTab === 'user' ? navigate('/companyinfo') : navigate('/results');
       }
     } catch (error) {
       setErrorMessage(error.response?.data?.message || 'Invalid email or password');
+    } finally {
+      setIsLoading(false); // Hide spinner
     }
   };
 
@@ -126,7 +131,13 @@ const Login = ({ videoSrc }) => {
 
               {errorMessage && <p className="error-message">{errorMessage}</p>}
 
-              <button type="submit" className="btn btn-primary">Login</button>
+              <button type="submit" className="btn btn-primary" disabled={isLoading}>
+                {isLoading ? (
+                  <div className="loading-spinner" style={{ margin: '0 auto' }} />
+                ) : (
+                  'Login'
+                )}
+              </button>
 
               <p className="signup-option">
                 Don't have an account?{' '}
