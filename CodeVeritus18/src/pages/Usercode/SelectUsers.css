@@ -135,6 +135,8 @@ textarea {
   display: none; 
 }
 
+
+
 @media (max-width: 768px) {
   .title {
     font-size: 2.5rem;
